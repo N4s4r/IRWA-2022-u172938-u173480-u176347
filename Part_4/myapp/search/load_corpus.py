@@ -2,7 +2,7 @@ import pandas as pd
 from collections import defaultdict
 from myapp.core.utils import load_json_file
 from myapp.search.objects import Document
-
+import json
 _corpus = {}
 
 ## OUR CODE
@@ -54,7 +54,12 @@ def docID2tweetID():
 
 def docID2tweet(path): 
     tweet2doc, doc2tweet = docID2tweetID()
-    json_data = load_json_file(path)
+    with open(path) as fp:
+        tweets = fp.read().split("\n") # each tweet is a new line 
+    tweets = [t for t in tweets if t != ""]
+    json_data=[]
+    for t in tweets:
+        json_data.append(json.loads(t))
     
     print(type(json_data))
     doc2tweet = dict()
@@ -68,13 +73,7 @@ def _load_corpus_as_dataframe(path):
     Load documents corpus from file in 'path'
     :return:
     """
-    with open(path) as fp:
-        tweets = fp.read().split("\n") # each tweet is a new line 
-    tweets = [t for t in tweets if t != ""]
-    json_data=[]
-    for t in tweets:
-        json_data.append(json.loads(t))
-
+    json_data = load_json_file(path)
     print(type(json_data))
     tweets_df = _load_tweets_as_dataframe(json_data)
     _clean_hashtags_and_urls(tweets_df)

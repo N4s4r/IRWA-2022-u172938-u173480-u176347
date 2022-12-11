@@ -103,14 +103,17 @@ def format_results_BM25(doc2tweet, results, top, df, search_id):
         item = df[df.DocID == doc].iloc[0]
         #print(item)
         tweet = doc2tweet[doc]
-        res.append(ResultItem(item['DocID'], item['Username']+': '+tweet[0:40]+'...', tweet, item['Date'], item['Url'], i+1))
+        Hashtags = " ".join(['#' + h for h in item['Hashtags'].replace('[', '').replace(']', '').replace("'", '').split(', ')])
+        docPageUrl = "doc_details?id={}&search_id={}&param2=2".format(item['DocID'], search_id)
+        title = item['Username']+': '+tweet[0:40]+'...'
+        res.append(ResultItem(item['DocID'], title, tweet, item['Date'], item['Url'], i+1, Hashtags, docPageUrl))
         # "doc_details?id={}&search_id={}&param2=2".format(item['DocID'], search_id), random.random()
     return res
 
 class SearchEngine:
     """educational search engine"""
 
-    def search(self, search_query, search_id, vocabulary, L_ave, dictionary_doc, df):
+    def search(self, doc2tweet, search_query, search_id, vocabulary, L_ave, dictionary_doc, df):
         print("Search query:", search_query)
 
         results = []

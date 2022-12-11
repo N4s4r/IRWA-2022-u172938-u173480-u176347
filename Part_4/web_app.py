@@ -59,6 +59,7 @@ dictionary_doc = dictionary_doc.set_index('DocID').T.to_dict('list')
 dictionary_doc = {k: x[0].split() for k, x in dictionary_doc.items()}
 file_path = path + "/../data/tw_hurricane_data.json"
 doc2tweet = docID2tweet(file_path)
+print(type(doc2tweet))
 ##END OF OUR CODE
 
 # Home URL "/"
@@ -127,7 +128,7 @@ def doc_details():
 
     print("fact_clicks count for id={} is {}".format(clicked_doc_id, analytics_data.fact_clicks[clicked_doc_id]))
 
-    return render_template('doc_details.html')
+    return render_template('doc_details.html', clicked_doc_id=clicked_doc_id, page_title='Document Details')
 
 
 @app.route('/stats', methods=['GET'])
