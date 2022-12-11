@@ -162,6 +162,15 @@ def stats():
     docs.sort(key=lambda doc: doc.count, reverse=True)
     return render_template('stats.html', clicks_data=docs)
     # ### End replace with your code ###
+    
+@app.route('/num_terms', methods=['GET'])
+def num_terms():
+    """
+    Show simple statistics example. ### Replace with dashboard ###
+    :return:
+    """
+    return render_template('num_terms.html')
+    # ### End replace with your code ###
 
 
     
