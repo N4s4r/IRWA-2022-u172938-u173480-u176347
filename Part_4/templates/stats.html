@@ -17,7 +17,7 @@
     {% for q in searched_queries %}
         <div class="pb-3">
             <div class="">
-                <span class="text-dark"> ({{ q.counter }} visits) </span> — query: {{ q.doc_id }}
+                <span class="text-dark"> ({{ q.counter }} searches) </span> — query: {{ q.doc_id }}
                 — {{ q.description }}
             </div>
         </div>
@@ -33,4 +33,33 @@
         </div>
         <hr>
     {% endfor %}
+    <h4>Searched terms:</h4>
+
+    {% for term in terms %}
+        <div class="pb-3">
+            <div class="">
+                <span class="text-dark"> ({{ term.counter }} searches) </span> — term: {{ term.doc_id }} — number of times in search query: {{ term.description }}
+            </div>
+        </div>
+        <hr>
+    {% endfor %}
+    <div style='text-align: center;'>
+    <table align="center" style="margin: 0px auto;">
+    <tr>
+        <th><a href="#" onclick="history.go(-1)">Go Back</a></th>
+        <th></th>
+        <th><a href="#" onclick="history.go(-2)">Go Back 2 pages</a></th> 
+        <th></th>
+        <th><a href="#" onclick="history.go(-3)">Go Back 3 pages</a></th>
+        <th></th>
+        <th><a href="#" onclick="history.go(-4)">Go Back 4 pages</a></th>
+        <th></th>
+        <th><a href="/stats" >Stats</a></th>
+        <th></th>
+        <th><a href="/dashboard" >Dashboard</a></th>
+        <th></th>
+        <th><a href="/user" >User</a></th>
+    </tr>
+    </table>
+    </div>
 {% endblock %}

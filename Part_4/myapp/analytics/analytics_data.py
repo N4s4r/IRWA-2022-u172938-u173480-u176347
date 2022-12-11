@@ -25,6 +25,12 @@ class AnalyticsData:
     #fact_doc_query is a dictionary with the queries related to a visited document: key = doc id | value = set of queries
     fact_doc_query = dict(set())
     
+    #fact_browser is a dictionary with the counts of each browser that was used: key = browser | value = count
+    fact_browser = dict([])
+    
+    #fact_terms is a dictionary with the counts of each term that has appeared in a query: key = term | value = count
+    fact_terms = dict([])
+    
     def save_query_terms(self, terms: str) -> int:
         print(self)
         return random.randint(0, 100000)

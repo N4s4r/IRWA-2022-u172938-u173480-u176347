@@ -71,13 +71,20 @@ def index():
     # flask server creates a session by persisting a cookie in the user's browser.
     # the 'session' object keeps data between multiple requests
     session['some_var'] = "IRWA 2021 home"
+    session['Num_clicks'] = 0
 
     user_agent = request.headers.get('User-Agent')
     print("Raw user browser:", user_agent)
 
     user_ip = request.remote_addr
     agent = httpagentparser.detect(user_agent)
-
+    
+    browser = agent['browser']['name']
+    if browser in analytics_data.fact_browser.keys():
+        analytics_data.fact_browser[browser] += 1
+    else:
+        analytics_data.fact_browser[browser] = 1
+        
     print("Remote IP: {} - JSON user browser {}".format(user_ip, agent))
 
     print(session)
@@ -87,6 +94,7 @@ def index():
 
 @app.route('/search', methods=['POST'])
 def search_form_post():
+    session['Num_clicks']+=1
     search_query = request.form['search-query']
     
     # Add the query to analytics_data
@@ -94,6 +102,12 @@ def search_form_post():
         analytics_data.fact_query[search_query] += 1
     else:
         analytics_data.fact_query[search_query] = 1
+        terms = search_query.split()
+        for term in terms:
+            if term in analytics_data.fact_terms.keys():
+                analytics_data.fact_terms[term] += 1
+            else:
+                analytics_data.fact_terms[term] = 1
     analytics_data.fact_query_len.append(len(search_query.split()))
         
     analytics_data.fact_query_time[search_query] = datetime.now()
@@ -114,6 +128,7 @@ def search_form_post():
 
 @app.route('/doc_details', methods=['GET'])
 def doc_details():
+    session['Num_clicks']+=1
     # getting request parameters:
     # user = request.args.get('user')
 
@@ -149,13 +164,13 @@ def doc_details():
 
 @app.route('/stats', methods=['GET'])
 def stats():
+    session['Num_clicks']+=1
     """
     Show simple statistics example. ### Replace with dashboard ###
     :return:
     """
 
     docs = []
-    # ### Start replace with your code ###
 
     for doc_id in analytics_data.fact_clicks:
         row: Document = df[df.DocID==doc_id].iloc[0]
@@ -163,7 +178,6 @@ def stats():
         doc = StatsDocument(row.DocID, row.Username, doc2tweet[row.DocID], row.Date, row.Url, count)
         docs.append(doc)
 
-    # simulate sort by ranking
     docs.sort(key=lambda doc: doc.count, reverse=True)
     
     queries = []
@@ -173,7 +187,6 @@ def stats():
         doc = ClickedDoc(query, 'Last time searched: '+str(analytics_data.fact_query_time[query]), analytics_data.fact_query[query])
         queries.append(doc)
 
-    # simulate sort by ranking
     queries.sort(key=lambda doc: doc.counter, reverse=True)
     queries_ser=[]
     for q in queries:
@@ -184,27 +197,59 @@ def stats():
         doc = ClickedDoc(doc_id, queries, len(queries))
         doc_queries.append(doc)
 
-    # simulate sort by ranking
     doc_queries.sort(key=lambda doc: doc.counter, reverse=True)
     doc_queries_ser=[]
     for dq in doc_queries:
         doc_queries_ser.append(dq.to_json())
-    return render_template('stats.html', clicks_data=docs, searched_queries = queries_ser, doc_queries=doc_queries)
-    # ### End replace with your code ###
+        
+    terms=[]
+    for term in analytics_data.fact_terms.keys():
+        q: Term = term
+        term_info = ClickedDoc(term, analytics_data.fact_terms[term], analytics_data.fact_terms[term])
+        terms.append(term_info)
+
+    terms.sort(key=lambda term_info: term_info.counter, reverse=True)
+    terms_ser=[]
+    for t in terms:
+        terms_ser.append(t.to_json())
+    return render_template('stats.html', clicks_data=docs, searched_queries = queries_ser, doc_queries=doc_queries, terms=terms_ser)
+    
     
 @app.route('/num_terms', methods=['GET'])
 def num_terms():
+    session['Num_clicks']+=1
     """
     Show simple statistics example. ### Replace with dashboard ###
     :return:
     """
-    return render_template('num_terms.html')
+    X = list(set(analytics_data.fact_query_len))
+    Y = list()
+    for x in X:
+        y = analytics_data.fact_query_len.count(x)
+        Y.append(y)
+    return render_template('num_terms.html', x=X, y=Y)
     # ### End replace with your code ###
+    
+@app.route('/terms', methods=['GET'])
+def terms():
+    session['Num_clicks']+=1
+    """
+    Show simple statistics example. ### Replace with dashboard ###
+    :return:
+    """
+    terms=analytics_data.fact_terms.items()
+    terms= sorted(terms, key=lambda x: x[1])
+    X_term = [str(x[0]) for x in terms]
+    Y_term = [x[1] for x in terms]
+    return render_template('terms.html', x_term=X_term, y_term=Y_term)
+    # ### End replace with your code ###
+
 
 
     
 @app.route('/user', methods=['GET'])
 def user():
+    session['Num_clicks']+=1
     """
     Show simple statistics example. ### Replace with dashboard ###
     :return:
@@ -226,13 +271,14 @@ def user():
         info['Query']='Nothing searched yet'
         info['Date']='-'
     info['Num_queries']=len(analytics_data.fact_query_time.keys())
-    info['Num_clicks']=0
+    info['Num_clicks']=session['Num_clicks']
     
-    return render_template('user.html', user=user_agent, ip=user_ip, agent=agent, info=info)
+    return render_template('user.html', user=user_agent, ip=user_ip, agent=agent, info=info, session=session)
     # ### End replace with your code ###
     
 @app.route('/dashboard', methods=['GET'])
 def dashboard():
+    session['Num_clicks']+=1
     visited_docs = []
     print(analytics_data.fact_clicks.keys())
     for doc_id in analytics_data.fact_clicks.keys():
@@ -263,11 +309,13 @@ def dashboard():
 
 @app.route('/sentiment')
 def sentiment_form():
+    session['Num_clicks']+=1
     return render_template('sentiment.html')
 
 
 @app.route('/sentiment', methods=['POST'])
 def sentiment_form_post():
+    session['Num_clicks']+=1
     text = request.form['text']
     nltk.download('vader_lexicon')
     from nltk.sentiment.vader import SentimentIntensityAnalyzer
