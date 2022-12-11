@@ -43,7 +43,7 @@ full_path = os.path.realpath(__file__)
 path, filename = os.path.split(full_path)
 # print(path + ' --> ' + filename + "\n")
 # load documents corpus into memory.
-file_path = path + "/tweets-data-who.json"
+file_path = path + "/tweets-data-WHO.json"
 
 # file_path = "../../tweets-data-who.json"
 corpus = load_corpus(file_path)
@@ -152,9 +152,10 @@ def dashboard():
 
     # simulate sort by ranking
     visited_docs.sort(key=lambda doc: doc.counter, reverse=True)
-
-    for doc in visited_docs: print(doc)
-    return render_template('dashboard.html', visited_docs=visited_docs)
+    visited_ser=[]
+    for doc in visited_docs:
+        visited_ser.append(doc.to_json())
+    return render_template('dashboard.html', visited_docs=visited_ser)
 
 
 @app.route('/sentiment')
