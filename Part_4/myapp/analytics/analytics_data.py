@@ -22,8 +22,8 @@ class AnalyticsData:
     fact_query_time = dict([])
     
     # statistics table 3
-    #fact_doc_query is a dictionary with the queries related to a visited document: key = doc id | value = list of queries
-    fact_doc_query = dict([])
+    #fact_doc_query is a dictionary with the queries related to a visited document: key = doc id | value = set of queries
+    fact_doc_query = dict(set())
     
     def save_query_terms(self, terms: str) -> int:
         print(self)

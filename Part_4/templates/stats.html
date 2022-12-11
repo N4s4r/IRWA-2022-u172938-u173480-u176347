@@ -17,7 +17,7 @@
     {% for q in searched_queries %}
         <div class="pb-3">
             <div class="">
-                <span class="text-dark"> ({{ q.counter }} visits) </span> — id: {{ q.doc_id }}
+                <span class="text-dark"> ({{ q.counter }} visits) </span> — query: {{ q.doc_id }}
                 — {{ q.description }}
             </div>
         </div>
@@ -28,7 +28,7 @@
     {% for doc in doc_queries %}
         <div class="pb-3">
             <div class="">
-                <span class="text-dark"> ({{ doc.counter }} visits) </span> — id: {{ doc.id }} — {{ doc.description }}
+                <span class="text-dark"> ({{ doc.counter }} visits) </span> — id: {{ doc.doc_id }} — related queries and the ranking of the document: {{ doc.description }}
             </div>
         </div>
         <hr>

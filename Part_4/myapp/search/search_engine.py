@@ -104,7 +104,7 @@ def format_results_BM25(doc2tweet, results, top, df, search_id):
         #print(item)
         tweet = doc2tweet[doc]
         Hashtags = " ".join(['#' + h for h in item['Hashtags'].replace('[', '').replace(']', '').replace("'", '').split(', ')])
-        docPageUrl = "doc_details?id={}&search_id={}&param2=2".format(item['DocID'], search_id)
+        docPageUrl = "doc_details?id={}&search_id={}&ranking={}".format(item['DocID'], search_id, i+1)
         title = item['Username']+': '+tweet[0:40]+'...'
         res.append(ResultItem(item['DocID'], title, tweet, item['Date'], item['Url'], i+1, Hashtags, docPageUrl))
         # "doc_details?id={}&search_id={}&param2=2".format(item['DocID'], search_id), random.random()

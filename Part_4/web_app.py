@@ -127,7 +127,7 @@ def doc_details():
     # get the query string parameters from request
     clicked_doc_id = request.args["id"]
     p1 = int(request.args["search_id"])  # transform to Integer
-    p2 = int(request.args["param2"])  # transform to Integer
+    ranking = int(request.args["ranking"])  # transform to Integer
     print("click in id={}".format(clicked_doc_id))
 
     # store data in statistics table 1
@@ -136,10 +136,10 @@ def doc_details():
     else:
         analytics_data.fact_clicks[clicked_doc_id] = 1
         
-    if clicked_doc_id in analytics_data.fact_doc_query.keys():
-        analytics_data.fact_doc_query[clicked_doc_id] += [session['last_search_query']] 
-    else:
-        analytics_data.fact_doc_query[clicked_doc_id] = [session['last_search_query']] 
+    if clicked_doc_id not in analytics_data.fact_doc_query.keys():
+        analytics_data.fact_doc_query[clicked_doc_id]=set()
+    analytics_data.fact_doc_query[clicked_doc_id].add((session['last_search_query'], ranking))
+        
     
     print("fact_clicks count for id={} is {}".format(clicked_doc_id, analytics_data.fact_clicks[clicked_doc_id]))
     result_item = df[df.DocID==clicked_doc_id].iloc[0]
@@ -175,7 +175,9 @@ def stats():
 
     # simulate sort by ranking
     queries.sort(key=lambda doc: doc.counter, reverse=True)
-    
+    queries_ser=[]
+    for q in queries:
+        queries_ser.append(q.to_json())
     doc_queries = []
     for doc_id in analytics_data.fact_doc_query:
         queries = analytics_data.fact_doc_query[doc_id]
@@ -184,8 +186,10 @@ def stats():
 
     # simulate sort by ranking
     doc_queries.sort(key=lambda doc: doc.counter, reverse=True)
-    
-    return render_template('stats.html', clicks_data=docs, searched_queries = queries, doc_queries=doc_queries)
+    doc_queries_ser=[]
+    for dq in doc_queries:
+        doc_queries_ser.append(dq.to_json())
+    return render_template('stats.html', clicks_data=docs, searched_queries = queries_ser, doc_queries=doc_queries)
     # ### End replace with your code ###
     
 @app.route('/num_terms', methods=['GET'])
@@ -221,6 +225,9 @@ def user():
     else:
         info['Query']='Nothing searched yet'
         info['Date']='-'
+    info['Num_queries']=len(analytics_data.fact_query_time.keys())
+    info['Num_clicks']=0
+    
     return render_template('user.html', user=user_agent, ip=user_ip, agent=agent, info=info)
     # ### End replace with your code ###
     

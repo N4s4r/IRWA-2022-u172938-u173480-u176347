@@ -8,6 +8,8 @@
     <h1 style='text-align: center; color: #457b9d;'> Details of User </h1>
     <p> This user is using the IP <b style='color:#219ebc'>{{ip}}</b> and his last search was:</p>
     <p  style='text-align: center;'> Time: <b style='color:#219ebc'>{{info['Date']}}</b> Query:  <b style='color:#219ebc'>{{info['Query']}}</b></p>
+    <p> Total number of distinct searches: <b style='color:#219ebc'>{{info['Num_queries']}}</b> </p>
+    <p> Total number of clicks: <b style='color:#219ebc'>{{info['Num_clicks']}}</b> </p>
     <p> The user is on a <b style='color:#219ebc'>{{agent['os']['name']+agent['platform']['version']}}</b> using <b style='color:#219ebc'>{{agent['browser']['name']}}</b> as a browser</p>
 </body>
 </html>
