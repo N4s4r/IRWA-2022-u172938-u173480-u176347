@@ -96,13 +96,14 @@ def BM25(query, vocabulary, k1, b, L_ave, doc_contents):
             
     return {k: v for k, v in sorted(RSV.items(), key=lambda item: item[1], reverse=True)}
 
-def format_results_BM25(results, top, df, search_id):
+def format_results_BM25(corpus, results, top, df, search_id):
     res = []
     for i in range(top):
         doc, score = list(results.items())[i]
         item = df[df.DocID == doc].iloc[0]
         #print(item)
-        res.append(ResultItem(item['DocID'], item['Username'], item['Tweet'], item['Date'], item['Url'], i+1))
+        tweet = corpus[corpus.Id == doc].Tweet.iloc[0]
+        res.append(ResultItem(item['DocID'], item['Username']+': '+tweet[0:40]+'...', tweet, item['Date'], item['Url'], i+1))
         # "doc_details?id={}&search_id={}&param2=2".format(item['DocID'], search_id), random.random()
     return res
 
@@ -114,8 +115,8 @@ class SearchEngine:
 
         results = []
         ##### your code here #####
-        results_BM25 = BM25(search_query, vocabulary, 1, 1, L_ave, dictionary_doc)#build_demo_results(corpus, search_id)  # replace with call to search algorithm
-        results = format_results_BM25(results_BM25, 20, df, search_id)
+        results_BM25 = BM25(search_query, vocabulary, 1, 0.75, L_ave, dictionary_doc)#build_demo_results(corpus, search_id)  # replace with call to search algorithm
+        results = format_results_BM25(corpus, results_BM25, 20, df, search_id)
         # results = search_in_corpus(search_query)
         ##### your code here #####
 

@@ -44,7 +44,7 @@ full_path = os.path.realpath(__file__)
 path, filename = os.path.split(full_path)
 # print(path + ' --> ' + filename + "\n")
 # load documents corpus into memory.
-file_path = path + "/tweets-data-WHO.json"
+file_path = path + "/../data/tw_hurricane_data.json"
 corpus = load_corpus(file_path)
 print("loaded corpus. first elem:", list(corpus.values())[0])
 
@@ -89,7 +89,7 @@ def search_form_post():
 
     search_id = analytics_data.save_query_terms(search_query)
 
-    results = search_engine.search(search_query, search_id, vocabulary, L_ave, dictionary_doc, df)
+    results = search_engine.search(corpus, search_query, search_id, vocabulary, L_ave, dictionary_doc, df)
 
     found_count = len(results)
     session['last_found_count'] = found_count

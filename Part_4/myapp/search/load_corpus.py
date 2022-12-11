@@ -39,6 +39,7 @@ def _load_corpus_as_dataframe(path):
     :return:
     """
     json_data = load_json_file(path)
+    print(type(json_data))
     tweets_df = _load_tweets_as_dataframe(json_data)
     _clean_hashtags_and_urls(tweets_df)
     # Rename columns to obtain: Tweet | Username | Date | Hashtags | Likes | Retweets | Url | Language
@@ -54,7 +55,7 @@ def _load_corpus_as_dataframe(path):
 
 
 def _load_tweets_as_dataframe(json_data):
-    data = pd.DataFrame(json_data).transpose()
+    data = pd.DataFrame.from_dict(json_data).transpose()
     # parse entities as new columns
     data = pd.concat([data.drop(['entities'], axis=1), data['entities'].apply(pd.Series)], axis=1)
     # parse user data as new columns and rename some columns to prevent duplicate column names
