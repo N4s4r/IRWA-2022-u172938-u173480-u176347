@@ -32,13 +32,49 @@ def load_corpus(path) -> [Document]:
     df.apply(_row_to_doc_dict, axis=1)
     return _corpus
 
+def docID2tweetID():
+    docs_path = '../data/tweet_document_ids_map.csv'
+
+    # reading file line by line, each one is a mapping for a specific tweet 
+    with open(docs_path) as fp:
+        lines = fp.read().split("\n") 
+    lines = [l for l in lines if l != ""] # ensure there are no empty lines
+    print("Total number of tweet documents in the corpus: {}".format(len(lines)))
+    # we store pairs (tweetId, docId) into 2 dictionaries 
+
+    tweet2doc = dict()
+    doc2tweet = dict()
+
+    for line in lines:
+        docID, tweetID = tuple(line.split("\t"))
+        tweet2doc[tweetID] = docID
+        doc2tweet[docID] = tweetID
+    return tweet2doc, doc2tweet
+
+
+def docID2tweet(path): 
+    tweet2doc, doc2tweet = docID2tweetID()
+    json_data = load_json_file(path)
+    
+    print(type(json_data))
+    doc2tweet = dict()
+    for c in json_data:
+        docID = tweet2doc.get(c["id_str"])
+        doc2tweet[docID] = c['full_text']
+    return  doc2tweet
 
 def _load_corpus_as_dataframe(path):
     """
     Load documents corpus from file in 'path'
     :return:
     """
-    json_data = load_json_file(path)
+    with open(path) as fp:
+        tweets = fp.read().split("\n") # each tweet is a new line 
+    tweets = [t for t in tweets if t != ""]
+    json_data=[]
+    for t in tweets:
+        json_data.append(json.loads(t))
+
     print(type(json_data))
     tweets_df = _load_tweets_as_dataframe(json_data)
     _clean_hashtags_and_urls(tweets_df)
@@ -51,6 +87,7 @@ def _load_corpus_as_dataframe(path):
     # select only interesting columns
     filter_columns = ["Id", "Tweet", "Username", "Date", "Hashtags", "Likes", "Retweets", "Url", "Language"]
     corpus = corpus[filter_columns]
+    
     return corpus
 
 

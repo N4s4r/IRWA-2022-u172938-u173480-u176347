@@ -44,9 +44,9 @@ full_path = os.path.realpath(__file__)
 path, filename = os.path.split(full_path)
 # print(path + ' --> ' + filename + "\n")
 # load documents corpus into memory.
-file_path = path + "/../data/tw_hurricane_data.json"
-corpus = load_corpus(file_path)
-print("loaded corpus. first elem:", list(corpus.values())[0])
+#file_path = path + "/../data/tw_hurricane_data.json"
+#corpus = load_corpus(file_path)
+#print("loaded corpus. first elem:", list(corpus.values())[0])
 
 ## OUR CODE
 file_path_processed = path + "/../processed_tweets.csv"
@@ -57,6 +57,8 @@ L_ave = np.mean([len(x.split()) for x in df.Tweet])
 dictionary_doc = df.copy().drop(columns=['Username', 'Date', 'Hashtags', 'Likes', 'Retweets', 'Url'])
 dictionary_doc = dictionary_doc.set_index('DocID').T.to_dict('list')
 dictionary_doc = {k: x[0].split() for k, x in dictionary_doc.items()}
+file_path = path + "/../data/tw_hurricane_data.json"
+doc2tweet = docID2tweet(file_path)
 ##END OF OUR CODE
 
 # Home URL "/"
@@ -89,7 +91,7 @@ def search_form_post():
 
     search_id = analytics_data.save_query_terms(search_query)
 
-    results = search_engine.search(corpus, search_query, search_id, vocabulary, L_ave, dictionary_doc, df)
+    results = search_engine.search(doc2tweet, search_query, search_id, vocabulary, L_ave, dictionary_doc, df)
 
     found_count = len(results)
     session['last_found_count'] = found_count
