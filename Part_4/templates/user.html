@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Detail - IRWA Search Engine</title>
+</head>
+<body bgcolor = '#a8dadc' style="font-family: Arial; padding-left: 80px; padding-right: 80px;">
+    <h1 style='text-align: center; color: #457b9d;'> Details of User </h1>
+    <p> This user is using the IP <b style='color:#219ebc'>{{ip}}</b> and his last search was:</p>
+    <p  style='text-align: center;'> Time: <b style='color:#219ebc'>{{info['Date']}}</b> Query:  <b style='color:#219ebc'>{{info['Query']}}</b></p>
+    <p> The user is on a <b style='color:#219ebc'>{{agent['os']['name']+agent['platform']['version']}}</b> using <b style='color:#219ebc'>{{agent['browser']['name']}}</b> as a browser</p>
+</body>
+</html>

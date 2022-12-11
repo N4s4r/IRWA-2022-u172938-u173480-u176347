@@ -4,13 +4,33 @@
     <meta charset="UTF-8">
     <title>Document Detail - IRWA Search Engine</title>
 </head>
-<body>
-    <h1> {{clicked_doc_id}} </h1>
-<div><a href="#" onclick="history.go(-1)">Go Back</a></div>
-<div><a href="#" onclick="history.go(-2)">Go Back 2 pages</a></div>
-<div><a href="#" onclick="history.go(-3)">Go Back 3 pages</a></div>
-<div><a href="#" onclick="history.go(-4)">Go Back 4 pages</a></div>
-<div><a href="/stats" >Stats</a></div>
-<div><a href="/dashboard" >Dashboard</a></div>
+<body bgcolor = '#a8dadc' style="font-family: Arial; padding-left: 80px; padding-right: 80px;">
+    <h1 style='text-align: center; color: #457b9d;'> Document Details of {{clicked_doc_id}} </h1>
+    <p> It was written by user <b style='color:#219ebc'>{{result_item['Username']}}</b> on the date: <b style='color:#219ebc'>{{result_item['Date']}}</b> </p>
+    <p> The tweet contains the following Hashtags: <b style='color:#219ebc'>{{'#'+" #".join(result_item['Hashtags'].replace('[', '').replace(']', '').replace("'", '').split(', '))}}</b> </p>
+    <p> You can visit the tweet using this url: <a href="{{result_item['Url']}}">{{result_item['Url']}}</a> </p>
+    <p> Tweet Content: </p>
+    <p style="padding: 30px; border: 2px solid #f1faee; text-align: center; background-color: = '#f1faee'">{{tweet}}</p>
+    <p> ❤️ {{result_item['Likes']}}  🔁 {{result_item['Retweets']}}</p>
+    <hr width="70%" align="center" color="DarkTurquoise">
+    <div style='text-align: center;'>
+    <table align="center" style="margin: 0px auto;">
+    <tr>
+        <th><a href="#" onclick="history.go(-1)">Go Back</a></th>
+        <th></th>
+        <th><a href="#" onclick="history.go(-2)">Go Back 2 pages</a></th> 
+        <th></th>
+        <th><a href="#" onclick="history.go(-3)">Go Back 3 pages</a></th>
+        <th></th>
+        <th><a href="#" onclick="history.go(-4)">Go Back 4 pages</a></th>
+        <th></th>
+        <th><a href="/stats" >Stats</a></th>
+        <th></th>
+        <th><a href="/dashboard" >Dashboard</a></th>
+        <th></th>
+        <th><a href="/user" >User</a></th>
+    </tr>
+    </table>
+    </div>
 </body>
 </html>

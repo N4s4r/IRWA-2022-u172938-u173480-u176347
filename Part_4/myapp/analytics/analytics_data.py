@@ -11,11 +11,15 @@ class AnalyticsData:
     # fact_clicks is a dictionary with the click counters: key = doc id | value = click counter
     fact_clicks = dict([])
 
-    # statistics table 2
-    fact_two = dict([])
+    # statistics table 2 
+    #fact_query is a dictionary with the search counters: key = query | value = search counter
+    #fact_query_length is a list of the query lengths
+    fact_query = dict([])
+    fact_query_len = list()
 
     # statistics table 3
-    fact_three = dict([])
+    #fact_query is a dictionary with the last time search: key = query | value = last time searched
+    fact_query_time = dict([])
 
     def save_query_terms(self, terms: str) -> int:
         print(self)

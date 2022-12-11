@@ -13,6 +13,7 @@ from myapp.search.objects import Document, StatsDocument
 from myapp.search.search_engine import SearchEngine
 
 import numpy as np
+from datetime import datetime
 
 # *** for using method to_json in objects ***
 def _default(self, obj):
@@ -80,14 +81,23 @@ def index():
     print("Remote IP: {} - JSON user browser {}".format(user_ip, agent))
 
     print(session)
-
+    
     return render_template('index.html', page_title="Welcome")
 
 
 @app.route('/search', methods=['POST'])
 def search_form_post():
     search_query = request.form['search-query']
-
+    
+    # Add the query to analytics_data
+    if search_query in analytics_data.fact_query.keys():
+        analytics_data.fact_query[search_query] += 1
+    else:
+        analytics_data.fact_query[search_query] = 1
+    analytics_data.fact_query_len.append(len(search_query.split()))
+        
+    analytics_data.fact_query_time[search_query] = datetime.now()
+    
     session['last_search_query'] = search_query
 
     search_id = analytics_data.save_query_terms(search_query)
@@ -127,8 +137,9 @@ def doc_details():
         analytics_data.fact_clicks[clicked_doc_id] = 1
 
     print("fact_clicks count for id={} is {}".format(clicked_doc_id, analytics_data.fact_clicks[clicked_doc_id]))
-
-    return render_template('doc_details.html', clicked_doc_id=clicked_doc_id, page_title='Document Details')
+    result_item = df[df.DocID==clicked_doc_id].iloc[0]
+    tweet = doc2tweet[clicked_doc_id]
+    return render_template('doc_details.html', clicked_doc_id=clicked_doc_id, result_item=result_item, tweet=tweet, page_title='Document Details')
 
 
 @app.route('/stats', methods=['GET'])
@@ -153,6 +164,32 @@ def stats():
     # ### End replace with your code ###
 
 
+    
+@app.route('/user', methods=['GET'])
+def user():
+    """
+    Show simple statistics example. ### Replace with dashboard ###
+    :return:
+    """
+    user_agent = request.headers.get('User-Agent')
+    print("Raw user browser:", user_agent)
+
+    user_ip = request.remote_addr
+    agent = httpagentparser.detect(user_agent)
+
+    print("Remote IP: {} - JSON user browser {}".format(user_ip, agent))
+    docs = []
+    # ### Start replace with your code ###
+    info = dict()
+    if analytics_data.fact_query_time:
+        info['Query']=session['last_search_query']
+        info['Date']=analytics_data.fact_query_time[info['Query']]
+    else:
+        info['Query']='Nothing searched yet'
+        info['Date']='-'
+    return render_template('user.html', user=user_agent, ip=user_ip, agent=agent, info=info)
+    # ### End replace with your code ###
+    
 @app.route('/dashboard', methods=['GET'])
 def dashboard():
     visited_docs = []
@@ -167,7 +204,20 @@ def dashboard():
     visited_ser=[]
     for doc in visited_docs:
         visited_ser.append(doc.to_json())
-    return render_template('dashboard.html', visited_docs=visited_ser)
+        
+    queries = []
+    print(analytics_data.fact_query.keys())
+    for query in analytics_data.fact_query.keys():
+        q: Query = query
+        doc = ClickedDoc(query, 'Last time searched: '+str(analytics_data.fact_query_time[query]), analytics_data.fact_query[query])
+        queries.append(doc)
+
+    # simulate sort by ranking
+    queries.sort(key=lambda doc: doc.counter, reverse=True)
+    queries_ser=[]
+    for q in queries:
+        queries_ser.append(q.to_json())
+    return render_template('dashboard.html', visited_docs=visited_ser, searched_queries = queries, unique_lengths = list(set(analytics_data.fact_query_len)), lengths = analytics_data.fact_query_len)
 
 
 @app.route('/sentiment')

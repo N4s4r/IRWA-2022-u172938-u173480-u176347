@@ -158,8 +158,222 @@
 
 
     <canvas id="dailyVisits2" width="400" height="400"></canvas>
+    
+    <script>
+        // 'visited_docs' is the data coming from Python code.
+        // load the python list in the JS variable 'visits_list':
+        const queries_list = {{ searched_queries | tojson | safe }};
+        console.log("searched queries: ")
+        console.log(queries_list)
+    </script>
+
+    <h5>Prefered Queries</h5>
+    <canvas id="dailyVisits3" width="400" height="400"></canvas>
 
 
+    <script>
+        // use JS map function top get just the tweet ids as labels
+        const queriesLabels = queries_list.map(a => "id: " + a.doc_id);
+        const queriesData = queries_list.map(a => a.counter);
+        const chartData2 = {
+            labels: queriesLabels,
+            datasets: [{
+                label: 'Searched count',
+                // data: [65, 59, 80, 81, 56, 55, 40],
+                data: queriesData,
+                fill: false,
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }]
+        };
+
+        const ctx2 = document.getElementById('dailyVisits3').getContext('2d');
+
+        // This will render the chart
+        const myChart2 = new Chart(ctx2, {
+            type: 'line',
+            data: chartData2,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+    </script>
+
+    <hr>
+    <h5>Print Python data for verification with graph above...</h5>
+    {% for q in searched_queries %}
+        <div class="pb-3">
+            <div class="">
+                <span class="text-dark"> ({{ q.counter }} visits) </span> — id: {{ q.doc_id }}
+                — {{ q.description }}
+            </div>
+        </div>
+        <hr>
+    {% endfor %}
+
+
+
+    <script>
+        // another example
+        const data2 = {
+            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+            datasets: [{
+                label: '# of Votes',
+                data: [12, 19, 3, 5, 2, 3],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        };
+
+        // This will render the chart
+        new Chart(document.getElementById("dailyVisits4"), {
+            type: 'bar',
+            data: {
+                labels: myLabels,
+                datasets: [{
+                    data: [1, 2, 3],
+                    label: "Alberta",
+                    borderColor: "#3e95cd",
+                    fill: false
+                }, {
+                    data: [1, 2, 3],
+                    label: "BC",
+                    borderColor: "#8e5ea2",
+                    fill: false
+                }, {
+                    data: [1, 2, 3],
+                    label: "Manitoba",
+                    borderColor: "#3cba9f",
+                    fill: false
+                }, {
+                    data: [1, 2, 3],
+                    label: "New Brunswick",
+                    borderColor: "#e8c3b9",
+                    fill: false
+                }, {
+                    data: [1, 2, 3],
+                    label: "NL",
+                    borderColor: "#c45850",
+                    fill: false
+                }
+                ]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Some title'
+                },
+                hover: {
+                    mode: 'index',
+                    intersect: true
+                },
+            }
+        });
+
+
+    </script>
+
+
+    <canvas id="dailyVisits4" width="400" height="400"></canvas>
+    <script>
+        const x_vals = unique_lengths;
+        const y_vals = [5, 8, 24, 16, 32, 42, 30, 17, 11];
+        const data = x_vals.map((k, i) => ({x: k, y: y_vals[i]}));
+
+        const backgroundColor = Array(x_vals.length).fill('rgba(255, 99, 132, 0.2)');
+        const borderColor = Array(x_vals.length).fill('rgba(255, 99, 132, 1)');
+
+        const backgroundColor[parseInt(x_vals.length / 2)] = 'rgba(54, 162, 235, 0.2)';
+        const borderColor[parseInt(x_vals.length / 2)] = 'rgba(54, 162, 235, 1)';
+
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                datasets: [{
+                    label: 'Num of Visitors',
+                    data: data,
+                    backgroundColor: backgroundColor,
+                    borderColor: borderColor,
+                    borderWidth: 1,
+                    barPercentage: 1,
+                    categoryPercentage: 1,
+                    borderRadius: 5,
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        type: 'linear',
+                        offset: false,
+                        grid: {
+                          offset: false
+                        },
+                        ticks: {
+                          stepSize: 1
+                        },
+                        title: {
+                          display: true,
+                          text: 'Hours',
+                          font: {
+                              size: 14
+                          }
+                        }
+                    }, 
+                    y: {
+                        // beginAtZero: true
+                        title: {
+                          display: true,
+                          text: 'Visitors',
+                          font: {
+                              size: 14
+                          }
+                        }
+                    }
+                },
+                plugins: {
+                  legend: {
+                      display: false,
+                    },
+                  tooltip: {
+                    callbacks: {
+                      title: (items) => {
+                        if (!items.length) {
+                          return '';
+                        }
+                        const item = items[0];
+                        const x = item.parsed.x;
+                        const min = x - 0.5;
+                        const max = x + 0.5;
+                        return `Hours: ${min} - ${max}`;
+                      }
+                    }
+                  }
+                }
+            }
+        });
+    </script>
+    
 
 {% endblock %}
 
