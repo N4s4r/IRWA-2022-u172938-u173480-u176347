@@ -142,9 +142,9 @@ def stats():
     # ### Start replace with your code ###
 
     for doc_id in analytics_data.fact_clicks:
-        row: Document = corpus[int(doc_id)]
+        row: Document = df[df.DocID==doc_id].iloc[0]
         count = analytics_data.fact_clicks[doc_id]
-        doc = StatsDocument(row.id, row.title, row.description, row.doc_date, row.url, count)
+        doc = StatsDocument(row.DocID, row.Username, doc2tweet[row.DocID], row.Date, row.Url, count)
         docs.append(doc)
 
     # simulate sort by ranking
@@ -158,8 +158,8 @@ def dashboard():
     visited_docs = []
     print(analytics_data.fact_clicks.keys())
     for doc_id in analytics_data.fact_clicks.keys():
-        d: Document = corpus[int(doc_id)]
-        doc = ClickedDoc(doc_id, d.description, analytics_data.fact_clicks[doc_id])
+        d: Document = df[df.DocID==doc_id].iloc[0]
+        doc = ClickedDoc(doc_id, doc2tweet[d.DocID], analytics_data.fact_clicks[doc_id])
         visited_docs.append(doc)
 
     # simulate sort by ranking
