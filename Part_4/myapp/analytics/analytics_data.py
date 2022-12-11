@@ -24,6 +24,7 @@ class AnalyticsData:
     # statistics table 3
     #fact_doc_query is a dictionary with the queries related to a visited document: key = doc id | value = list of queries
     fact_doc_query = dict([])
+    
     def save_query_terms(self, terms: str) -> int:
         print(self)
         return random.randint(0, 100000)

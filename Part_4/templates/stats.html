@@ -12,4 +12,25 @@
         </div>
         <hr>
     {% endfor %}
+    <h4>Searched queries:</h4>
+
+    {% for q in searched_queries %}
+        <div class="pb-3">
+            <div class="">
+                <span class="text-dark"> ({{ q.counter }} visits) </span> — id: {{ q.doc_id }}
+                — {{ q.description }}
+            </div>
+        </div>
+        <hr>
+    {% endfor %}
+    <h4>Documents visited and the queries they are related to:</h4>
+
+    {% for doc in doc_queries %}
+        <div class="pb-3">
+            <div class="">
+                <span class="text-dark"> ({{ doc.counter }} visits) </span> — id: {{ doc.id }} — {{ doc.description }}
+            </div>
+        </div>
+        <hr>
+    {% endfor %}
 {% endblock %}

@@ -135,7 +135,12 @@ def doc_details():
         analytics_data.fact_clicks[clicked_doc_id] += 1
     else:
         analytics_data.fact_clicks[clicked_doc_id] = 1
-
+        
+    if clicked_doc_id in analytics_data.fact_doc_query.keys():
+        analytics_data.fact_doc_query[clicked_doc_id] += [session['last_search_query']] 
+    else:
+        analytics_data.fact_doc_query[clicked_doc_id] = [session['last_search_query']] 
+    
     print("fact_clicks count for id={} is {}".format(clicked_doc_id, analytics_data.fact_clicks[clicked_doc_id]))
     result_item = df[df.DocID==clicked_doc_id].iloc[0]
     tweet = doc2tweet[clicked_doc_id]
@@ -160,7 +165,27 @@ def stats():
 
     # simulate sort by ranking
     docs.sort(key=lambda doc: doc.count, reverse=True)
-    return render_template('stats.html', clicks_data=docs)
+    
+    queries = []
+    print(analytics_data.fact_query.keys())
+    for query in analytics_data.fact_query.keys():
+        q: Query = query
+        doc = ClickedDoc(query, 'Last time searched: '+str(analytics_data.fact_query_time[query]), analytics_data.fact_query[query])
+        queries.append(doc)
+
+    # simulate sort by ranking
+    queries.sort(key=lambda doc: doc.counter, reverse=True)
+    
+    doc_queries = []
+    for doc_id in analytics_data.fact_doc_query:
+        queries = analytics_data.fact_doc_query[doc_id]
+        doc = ClickedDoc(doc_id, queries, len(queries))
+        doc_queries.append(doc)
+
+    # simulate sort by ranking
+    doc_queries.sort(key=lambda doc: doc.counter, reverse=True)
+    
+    return render_template('stats.html', clicks_data=docs, searched_queries = queries, doc_queries=doc_queries)
     # ### End replace with your code ###
     
 @app.route('/num_terms', methods=['GET'])
