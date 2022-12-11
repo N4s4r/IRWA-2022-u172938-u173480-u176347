@@ -1,11 +1,26 @@
 import pandas as pd
-
+from collections import defaultdict
 from myapp.core.utils import load_json_file
 from myapp.search.objects import Document
 
 _corpus = {}
 
+## OUR CODE
 
+def load_processed_tweets_from_csv(path):
+    df = pd.read_csv(path).drop(columns=['Unnamed: 0'])
+    return df
+
+def extract_tweet_vocabulary(tweet, docId):
+    return {term: docId for term in tweet.split(' ')}
+def merge_dicts(dicts):
+    vocab = defaultdict(list)
+    for dic in dicts:
+        for term in dic:
+            vocab[term].append(dic[term])
+    return dict(vocab)
+
+## END OF OUR CODE
 def load_corpus(path) -> [Document]:
     """
     Load file and transform to dictionary with each document as an object for easier treatment when needed for displaying

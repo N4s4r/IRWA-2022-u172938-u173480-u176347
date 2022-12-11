@@ -8,10 +8,11 @@ from flask import Flask, render_template, session
 from flask import request
 
 from myapp.analytics.analytics_data import AnalyticsData, ClickedDoc
-from myapp.search.load_corpus import load_corpus
+from myapp.search.load_corpus import *
 from myapp.search.objects import Document, StatsDocument
 from myapp.search.search_engine import SearchEngine
 
+import numpy as np
 
 # *** for using method to_json in objects ***
 def _default(self, obj):
@@ -44,11 +45,19 @@ path, filename = os.path.split(full_path)
 # print(path + ' --> ' + filename + "\n")
 # load documents corpus into memory.
 file_path = path + "/tweets-data-WHO.json"
-
-# file_path = "../../tweets-data-who.json"
 corpus = load_corpus(file_path)
 print("loaded corpus. first elem:", list(corpus.values())[0])
 
+## OUR CODE
+file_path_processed = path + "/../processed_tweets.csv"
+df = load_processed_tweets_from_csv(file_path_processed)
+tweets_dicts = map(extract_tweet_vocabulary, df['Tweet'], df['DocID'])
+vocabulary = merge_dicts(tweets_dicts)
+L_ave = np.mean([len(x.split()) for x in df.Tweet])
+dictionary_doc = df.copy().drop(columns=['Username', 'Date', 'Hashtags', 'Likes', 'Retweets', 'Url'])
+dictionary_doc = dictionary_doc.set_index('DocID').T.to_dict('list')
+dictionary_doc = {k: x[0].split() for k, x in dictionary_doc.items()}
+##END OF OUR CODE
 
 # Home URL "/"
 @app.route('/')
@@ -80,7 +89,7 @@ def search_form_post():
 
     search_id = analytics_data.save_query_terms(search_query)
 
-    results = search_engine.search(search_query, search_id, corpus)
+    results = search_engine.search(search_query, search_id, vocabulary, L_ave, dictionary_doc, df)
 
     found_count = len(results)
     session['last_found_count'] = found_count

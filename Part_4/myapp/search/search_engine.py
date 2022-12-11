@@ -1,7 +1,11 @@
 import random
-
+from nltk.corpus import stopwords
+import re
+import contractions
 from myapp.search.objects import ResultItem, Document
-
+from nltk.stem import PorterStemmer
+from nltk.stem import WordNetLemmatizer
+import numpy as np
 
 def build_demo_results(corpus: dict, search_id):
     """
@@ -24,6 +28,39 @@ def build_demo_results(corpus: dict, search_id):
     # simulate sort by ranking
     res.sort(key=lambda doc: doc.ranking, reverse=True)
     return res
+
+def build_terms(line):
+    """
+    Preprocess the tweet content removing stop words, contractionas and urls
+    lemmatizing and stemming words to keep a single word for each family of words
+    transforming in lowercase, removing special characters [#, @, .] 
+    (since it is included in another column on the dataframe)
+    
+    return tokenized tweet (list of words after applying the previous steps).
+    
+    Argument:
+    line -- string (tweet) to be preprocessed
+    
+    Returns:
+    line - a list of tokens corresponding to the input text after the preprocessing
+    """
+    ## START CODE
+    line = line.lower() ##Transform in lowercase
+    line = re.sub(r"[^A-Za-z 0-9 ']+", '', line) # remove emojis and any other special character
+    stop_words = set(stopwords.words("english")) # removing stopwords
+    line = ' '.join([contractions.fix(x) for x in line.split(' ')]) # expaning verb abreviations: i'll -> i will 
+    line = re.sub("'", '', line) 
+    line = line.split(' ')
+    line = [x for x in line if x and x not in stop_words]
+    line = filter(lambda x:x[0:5]!='https', line) # removing links
+    line = [x for x in line]
+    ps = PorterStemmer() 
+    lemmatizer = WordNetLemmatizer() 
+    line = [lemmatizer.lemmatize(x) for x in line] # keeping the singular form of each noun: feet --> foot
+    line = [ps.stem(x) for x in line] # keeping the root of each family of words: dancer --> danc
+    
+    ## END CODE
+    return ' '.join(line)
 
 def BM25(query, vocabulary, k1, b, L_ave, doc_contents):
     '''
@@ -59,16 +96,26 @@ def BM25(query, vocabulary, k1, b, L_ave, doc_contents):
             
     return {k: v for k, v in sorted(RSV.items(), key=lambda item: item[1], reverse=True)}
 
+def format_results_BM25(results, top, df, search_id):
+    res = []
+    for i in range(top):
+        doc, score = list(results.items())[i]
+        item = df[df.DocID == doc].iloc[0]
+        #print(item)
+        res.append(ResultItem(item['DocID'], item['Username'], item['Tweet'], item['Date'], item['Url'], i+1))
+        # "doc_details?id={}&search_id={}&param2=2".format(item['DocID'], search_id), random.random()
+    return res
+
 class SearchEngine:
     """educational search engine"""
 
-    def search(self, search_query, search_id, corpus):
+    def search(self, search_query, search_id, vocabulary, L_ave, dictionary_doc, df):
         print("Search query:", search_query)
 
         results = []
         ##### your code here #####
-        results = BM25(search_query, vocabulary, 1, 1, L_ave, dictionary_doc)#build_demo_results(corpus, search_id)  # replace with call to search algorithm
-
+        results_BM25 = BM25(search_query, vocabulary, 1, 1, L_ave, dictionary_doc)#build_demo_results(corpus, search_id)  # replace with call to search algorithm
+        results = format_results_BM25(results_BM25, 20, df, search_id)
         # results = search_in_corpus(search_query)
         ##### your code here #####
 
