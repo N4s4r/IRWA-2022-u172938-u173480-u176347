@@ -13,6 +13,7 @@ from myapp.search.objects import Document, StatsDocument
 from myapp.search.search_engine import SearchEngine
 
 import numpy as np
+import time
 from datetime import datetime
 
 # *** for using method to_json in objects ***
@@ -39,15 +40,8 @@ search_engine = SearchEngine()
 # instantiate our in memory persistence
 analytics_data = AnalyticsData()
 
-# print("current dir", os.getcwd() + "\n")
-# print("__file__", __file__ + "\n")
 full_path = os.path.realpath(__file__)
 path, filename = os.path.split(full_path)
-# print(path + ' --> ' + filename + "\n")
-# load documents corpus into memory.
-#file_path = path + "/../data/tw_hurricane_data.json"
-#corpus = load_corpus(file_path)
-#print("loaded corpus. first elem:", list(corpus.values())[0])
 
 ## OUR CODE
 file_path_processed = path + "/../processed_tweets.csv"
@@ -71,8 +65,13 @@ def index():
     # flask server creates a session by persisting a cookie in the user's browser.
     # the 'session' object keeps data between multiple requests
     session['some_var'] = "IRWA 2021 home"
+    #initialise num of clicks
     session['Num_clicks'] = 0
-
+    
+    if 'dwell_time' in session.keys():
+        now_ = time.time()
+        session['dwell_time'] = now_ - session['dwell_time']
+        
     user_agent = request.headers.get('User-Agent')
     print("Raw user browser:", user_agent)
 
@@ -122,15 +121,16 @@ def search_form_post():
     session['last_found_count'] = found_count
 
     print(session)
-
-    return render_template('results.html', results_list=results, page_title="Results", found_counter=found_count)
+    dwell_time = 0.0
+    if 'dwell_time' in session.keys():
+        dwell_time = session['dwell_time']
+    return render_template('results.html', results_list=results, page_title="Results", found_counter=found_count, dwell_time=round(dwell_time, 2))
 
 
 @app.route('/doc_details', methods=['GET'])
 def doc_details():
     session['Num_clicks']+=1
-    # getting request parameters:
-    # user = request.args.get('user')
+    session['dwell_time']=time.time()
 
     print("doc details session: ")
     print(session)
@@ -230,18 +230,18 @@ def num_terms():
     return render_template('num_terms.html', x=X, y=Y)
     # ### End replace with your code ###
     
-@app.route('/terms', methods=['GET'])
-def terms():
+@app.route('/browsers', methods=['GET'])
+def browsers():
     session['Num_clicks']+=1
     """
     Show simple statistics example. ### Replace with dashboard ###
     :return:
     """
-    terms=analytics_data.fact_terms.items()
-    terms= sorted(terms, key=lambda x: x[1])
-    X_term = [str(x[0]) for x in terms]
-    Y_term = [x[1] for x in terms]
-    return render_template('terms.html', x_term=X_term, y_term=Y_term)
+    browsers=analytics_data.fact_browser.items()
+    browsers= sorted(browsers, key=lambda x: x[1])
+    X_browsers = [str(x[0]) for x in browsers]
+    Y_browsers = [x[1] for x in browsers]
+    return render_template('browsers.html', x_browsers=X_browsers, y_browsers=Y_browsers)
     # ### End replace with your code ###
 
 
@@ -304,7 +304,18 @@ def dashboard():
     queries_ser=[]
     for q in queries:
         queries_ser.append(q.to_json())
-    return render_template('dashboard.html', visited_docs=visited_ser, searched_queries = queries, unique_lengths = list(set(analytics_data.fact_query_len)), lengths = analytics_data.fact_query_len)
+        
+    terms=[]
+    for term in analytics_data.fact_terms.keys():
+        q: Term = term
+        term_info = ClickedDoc(term, analytics_data.fact_terms[term], analytics_data.fact_terms[term])
+        terms.append(term_info)
+
+    terms.sort(key=lambda term_info: term_info.counter, reverse=True)
+    terms_ser=[]
+    for t in terms:
+        terms_ser.append(t.to_json())
+    return render_template('dashboard.html', visited_docs=visited_ser, searched_queries = queries, searched_terms=terms_ser)
 
 
 @app.route('/sentiment')

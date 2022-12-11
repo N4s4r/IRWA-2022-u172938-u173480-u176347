@@ -78,86 +78,6 @@
         </div>
         <hr>
     {% endfor %}
-
-
-
-    <script>
-        // another example
-        const data2 = {
-            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-            datasets: [{
-                label: '# of Votes',
-                data: [12, 19, 3, 5, 2, 3],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 1
-            }]
-        };
-
-        // This will render the chart
-        new Chart(document.getElementById("dailyVisits2"), {
-            type: 'bar',
-            data: {
-                labels: myLabels,
-                datasets: [{
-                    data: [1, 2, 3],
-                    label: "Alberta",
-                    borderColor: "#3e95cd",
-                    fill: false
-                }, {
-                    data: [1, 2, 3],
-                    label: "BC",
-                    borderColor: "#8e5ea2",
-                    fill: false
-                }, {
-                    data: [1, 2, 3],
-                    label: "Manitoba",
-                    borderColor: "#3cba9f",
-                    fill: false
-                }, {
-                    data: [1, 2, 3],
-                    label: "New Brunswick",
-                    borderColor: "#e8c3b9",
-                    fill: false
-                }, {
-                    data: [1, 2, 3],
-                    label: "NL",
-                    borderColor: "#c45850",
-                    fill: false
-                }
-                ]
-            },
-            options: {
-                title: {
-                    display: true,
-                    text: 'Some title'
-                },
-                hover: {
-                    mode: 'index',
-                    intersect: true
-                },
-            }
-        });
-
-
-    </script>
-
-
-    <canvas id="dailyVisits2" width="400" height="400"></canvas>
     
     <script>
         // 'visited_docs' is the data coming from Python code.
@@ -168,7 +88,7 @@
     </script>
 
     <h5>Prefered Queries</h5>
-    <canvas id="dailyVisits3" width="400" height="400"></canvas>
+    <canvas id="dailyVisits2" width="400" height="400"></canvas>
 
 
     <script>
@@ -187,7 +107,7 @@
             }]
         };
 
-        const ctx2 = document.getElementById('dailyVisits3').getContext('2d');
+        const ctx2 = document.getElementById('dailyVisits2').getContext('2d');
 
         // This will render the chart
         const myChart2 = new Chart(ctx2, {
@@ -214,118 +134,39 @@
             </div>
         </div>
         <hr>
-    {% endfor %}
-
-
-
-    <script>
-        // another example
-        const data2 = {
-            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-            datasets: [{
-                label: '# of Votes',
-                data: [12, 19, 3, 5, 2, 3],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 1
-            }]
-        };
-
-        // This will render the chart
-        new Chart(document.getElementById("dailyVisits4"), {
-            type: 'bar',
-            data: {
-                labels: myLabels,
-                datasets: [{
-                    data: [1, 2, 3],
-                    label: "Alberta",
-                    borderColor: "#3e95cd",
-                    fill: false
-                }, {
-                    data: [1, 2, 3],
-                    label: "BC",
-                    borderColor: "#8e5ea2",
-                    fill: false
-                }, {
-                    data: [1, 2, 3],
-                    label: "Manitoba",
-                    borderColor: "#3cba9f",
-                    fill: false
-                }, {
-                    data: [1, 2, 3],
-                    label: "New Brunswick",
-                    borderColor: "#e8c3b9",
-                    fill: false
-                }, {
-                    data: [1, 2, 3],
-                    label: "NL",
-                    borderColor: "#c45850",
-                    fill: false
-                }
-                ]
-            },
-            options: {
-                title: {
-                    display: true,
-                    text: 'Some title'
-                },
-                hover: {
-                    mode: 'index',
-                    intersect: true
-                },
-            }
-        });
-
-
-    </script>
-    
+    {% endfor %}    
 
     <script>
         const terms_list = {{ searched_terms | tojson | safe }};
-        console.log("visited docs: ")
-        console.log(visits_list)
+        console.log("terms list: ")
+        console.log(terms_list)
     </script>
 
-    <h5>Ranking of Visited Documents</h5>
+    <h5>Ranking of Searched Terms</h5>
     <canvas id="terms" width="400" height="400"></canvas>
 
 
     <script>
         // use JS map function top get just the tweet ids as labels
-        const visitsLabels = terms_list.map(a => "id: " + a.doc_id);
-        const visitsData = terms_list.map(a => a.counter);
-        const chartData1 = {
-            labels: visitsLabels,
+        const termsLabels = terms_list.map(a => "term: " + a.doc_id);
+        const termsData = terms_list.map(a => a.counter);
+        const chartDataTerms = {
+            labels: termsLabels,
             datasets: [{
-                label: 'Visits count',
-                // data: [65, 59, 80, 81, 56, 55, 40],
-                data: visitsData,
+                label: 'Searched count',
+                data: termsData,
                 fill: false,
                 borderColor: 'rgb(75, 192, 192)',
                 tension: 0.1
             }]
         };
 
-        const ctx = document.getElementById('dailyVisits').getContext('2d');
+        const ctx3 = document.getElementById('terms').getContext('2d');
 
         // This will render the chart
-        const myChart = new Chart(ctx, {
+        const myChart3 = new Chart(ctx3, {
             type: 'line',
-            data: chartData1,
+            data: chartDataTerms,
             options: {
                 scales: {
                     y: {
@@ -339,19 +180,19 @@
 
     <hr>
     <h5>Print Python data for verification with graph above...</h5>
-    {% for doc in visited_docs %}
+    {% for term in searched_terms %}
         <div class="pb-3">
             <div class="">
-                <span class="text-dark"> ({{ doc.counter }} visits) </span> — id: {{ doc.doc_id }}
-                — {{ doc.description }}
+                <span class="text-dark"> ({{ term.counter }} searches) </span> — term: {{ term.doc_id }}
+                — number of times in search query: {{ term.description }}
             </div>
         </div>
         <hr>
     {% endfor %}
 
 
-    <a href="/num_terms">Click here to see a histogram of the number of terms of queries</a>
-    <a href="/terms">Click here to see a histogram of the appearance of the terms of the queries</a>
+    <p><a href="/num_terms">Click here to see a histogram of the number of terms of queries</p>
+    <p><a href="/browsers">Click here to see a pie chart of the browsers used</p>
     <hr width="70%" align="center" color="DarkTurquoise">
     <div style='text-align: center;'>
     <table align="center" style="margin: 0px auto;">

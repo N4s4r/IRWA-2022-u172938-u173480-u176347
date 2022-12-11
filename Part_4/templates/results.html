@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% block page_title %}{{ page_title }}{% endblock %}
 {% block content %}
-    Found <strong>{{ found_counter }}</strong> results...
+    <p style='text-align:right;'>{{dwell_time}} seconds of dwell time</p>
+    <a>Found <strong>{{ found_counter }}</strong> results...<a>
     <hr>
     {% for item in results_list %}
         <div class="pb-3">
